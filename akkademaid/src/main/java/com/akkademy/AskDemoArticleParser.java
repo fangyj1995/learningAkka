@@ -20,10 +20,10 @@ public class AskDemoArticleParser extends AbstractActor {
     private final ActorSelection articleParseActor;
     private final Timeout timeout;
 
-    public AskDemoArticleParser(ActorSelection cacheActor, ActorSelection httpClientActor, ActorSelection artcileParseActor, Timeout timeout) {
-        this.cacheActor = cacheActor;
-        this.httpClientActor = httpClientActor;
-        this.articleParseActor = artcileParseActor;
+    public AskDemoArticleParser(String cacheActorPath, String httpClientActorPath, String articleParseActorPath, Timeout timeout) {
+        this.cacheActor = context().actorSelection(cacheActorPath);
+        this.httpClientActor = context().actorSelection(httpClientActorPath);
+        this.articleParseActor = context().actorSelection(articleParseActorPath);
         this.timeout = timeout;
     }
 
@@ -33,9 +33,7 @@ public class AskDemoArticleParser extends AbstractActor {
             final CompletionStage cacheResult = toJava(ask(cacheActor, new GetRequest(msg.url), timeout));//!ask1
             //see if the cacheActor got the result
             final CompletionStage result = cacheResult.handle((x, t) -> {
-                return (x != null)
-                        ? CompletableFuture.completedFuture(x)// cached
-                        //x == null
+                return(x != null) ? CompletableFuture.completedFuture(x)
                         : toJava(ask(httpClientActor, msg.url, timeout))//!ask 1
                         .thenCompose(rawArticle ->
                                 toJava(ask(articleParseActor,//!ask 2
