@@ -18,13 +18,13 @@ import java.util.Set;
 
 public class AkkademyDb extends AbstractActor {
     protected final LoggingAdapter log = Logging.getLogger(context().system(), this);
-    protected final Map<String, Object> map = new HashMap<>();
+    public final Map<String, Object> map = new HashMap<>();
 
     private AkkademyDb() {
         //调用父类的receive方法
         receive(ReceiveBuilder
                 .match(Connected.class, message -> {
-                    log.info("Received COnnected requesr:{}", message);
+                    log.info("Received Connected request:{}", message);
                     sender().tell(new Connected(), self());
                 })
                 .match(List.class, message -> {
